@@ -3,7 +3,7 @@ var northAmericaCoords = [54.5260 -105.2551];
 var mapZoomLevel = 3.5;
 var birdMap 
 var url = "___"
-
+let local_url = 'http://127.0.0.1:5000/api/v1.0/all_data_dates/2015-01-01/2015-05-01'
 
 // Create the createMap function.
 function createMap(birdSpecies) {
@@ -35,6 +35,11 @@ const overlayMaps = {
     collapsed: false
   }).addtTo(birdMap);
 };
+
+d3.json(local_url).then((data)=>{
+  //let lats = data.Latitude;
+  console.log(data);
+});
 // // Create the createMarkers function.
 // function createMarkers (reponse) {
 

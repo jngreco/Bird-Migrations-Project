@@ -5,6 +5,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, inspect
 from flask import Flask, jsonify
+from flask_cors import CORS
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -29,7 +30,7 @@ Birdmetadata = Base.classes.birdmetadata
 # Flask Setup
 ####
 app = Flask(__name__)
-
+CORS(app)
 ####
 # Flask Routes
 ####
@@ -39,6 +40,7 @@ def welcome():
         f"Available Routes:<br/>"
         f"/api/v1.0/obs_by_name_and_date/common_name/start/end<br/>"
         f"/api/v1.0/metadata_by_name/common_name<br/>"
+        f"/api/v1.0/all_data_dates/start/end<br/>"
     )
 
 # Helper function to convert SQL Alchemy ORM rows to dictionaries
@@ -47,6 +49,39 @@ def object_as_dict(row):
     for column in inspect(row).mapper.column_attrs:
         result[column.key] = getattr(row, column.key)
     return result
+
+####
+# /api/v1.0/obs_by_name_and_date
+# Example URL:  http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/Bald%20Eagle/2011-01-19/2011-01-20
+####  
+@app.route("/api/v1.0/all_data_dates/<start>/<end>")
+def all_data_dates(start, end):
+
+    # Create session from Python to the DB:
+    session = Session(engine)
+
+    # Get data for the selected common_name and date ranges
+    results = session.query(Birds.LONGITUDE, Birds.LATITUDE).\
+        filter(
+            Birds.OBSERVATION_DATE >= (start),
+            Birds.OBSERVATION_DATE <= (end),
+        ).all()
+
+    # Convert each row into a dictionary for jsonify:
+    bird_data = []
+    for longitude,latitude in results:
+        bird_dict = {}
+        bird_dict["Longitude"] = results[0][0]
+        bird_dict["Latitude"] = results[0][1]
+        bird_data.append(bird_dict)
+    #bird_data = [object_as_dict(row) for row in bird_data]
+
+    # Close the session as soon as it's no longer needed:
+    session.close()
+
+    # Return the JSON representation of your dictionary.
+    return jsonify(bird_data)
+
 
 ####
 # /api/v1.0/obs_by_name_and_date
