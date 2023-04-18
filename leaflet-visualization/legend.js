@@ -1,3 +1,31 @@
+// Store URL in a variable 
+let url = ___
+
+// Use D3 library to access API 
+d3.json(url).then(function (data) {
+    console.log(data);
+    newFeature(data.features);
+}); 
+
+// Set Marker size based on number of observations
+function markersize(density) {
+    return density * 2500;
+};
+
+
+// Determine color of point based on bird density/ observation count at each coord pair 
+function color(bird) {
+    if (bird < 250) return "#FBDD49" ;
+    else if (bird < 500) return "#FF8103";
+    else if (bird < 700) return "#FF1C6A";
+    else if (bird < 1000) return "#E200A3";
+    else if (bird < 4000) return "#9B04D";
+    else return "#6D1DC6";
+;
+
+
+}
+
 // Here we create a legend control object.
 {var legend = L.control({
     position: "bottomleft"
