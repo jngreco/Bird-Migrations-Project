@@ -61,7 +61,7 @@ def all_data_dates(start, end):
     session = Session(engine)
 
     # Get data for the selected common_name and date ranges
-    results = session.query(Birds.LONGITUDE, Birds.LATITUDE).\
+    results = session.query(Birds.BIRD_INDEX ,Birds.COMMON_NAME, Birds.LONGITUDE, Birds.LATITUDE).\
         filter(
             Birds.OBSERVATION_DATE >= (start),
             Birds.OBSERVATION_DATE <= (end),
@@ -69,10 +69,12 @@ def all_data_dates(start, end):
 
     # Convert each row into a dictionary for jsonify:
     bird_data = []
-    for longitude,latitude in results:
+    for b_index,name,longitude,latitude in results:
         bird_dict = {}
-        bird_dict["Longitude"] = results[0][0]
-        bird_dict["Latitude"] = results[0][1]
+        bird_dict["Bird Index"] = results[0][0]
+        bird_dict["Common Name"] = results[0][1]
+        bird_dict["Longitude"] = results[0][2]
+        bird_dict["Latitude"] = results[0][3]
         bird_data.append(bird_dict)
     #bird_data = [object_as_dict(row) for row in bird_data]
 
