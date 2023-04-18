@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <title>Test Map</title>
 
-       <!-- Leaflet CSS from https://leafletjs.com/download.html  -->
+    <!-- D3
+  <script src="https://d3js.org/d3.v5.min.js"></script> -->
+
+    <!-- Leaflet CSS from https://leafletjs.com/download.html  -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
@@ -31,24 +34,25 @@
     <!-- The div that holds our map -->
     <div id="map"></div>
 
+    <!-- Our JavaScript file -->
+    <script type="text/javascript" src="leaflet-starter.js"></script>
+
     <!-- Map Script -->
     <script>
-      var map = L.map("map").setView({ lat: 54.526, lng: 105.2551 }, 3.5);
+      var map = L.map("map").setView({ lat: 48.1667, lng: -100.1800 }, 3.5);
 
-      // <!-- Grayscale tile layer -->
+       // <!-- Grayscale tile layer from https://leaflet-extras.github.io/leaflet-providers/preview/ -->
+       const stadiaApiKey = "2c123743-986c-4ecb-b344-8365391f30f3"
       var Stadia_AlidadeSmoothDark = L.tileLayer(
-        "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+        "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}",
         {
           maxZoom: 20,
+          apiKey : stadiaApiKey,
           attribution:
-            '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+            '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
         }
       );
       Stadia_AlidadeSmoothDark.addTo(map);
     </script>
-     <!-- D3  Javascript-->
-    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
-    <!-- Our Javascript file-->
-    <script type = "text/javascript" src="leaflet-starter.js"></script>
   </body>
 </html>
