@@ -39,10 +39,10 @@
 
     <!-- Map Script -->
     <script>
-      var map = L.map("map").setView({ lat: 54.526, lng: 105.2551 }, 3.5);
+      var map = L.map("map").setView({ lat: 48.1667, lng: -100.1800 }, 3.5);
 
-      // <!-- Grayscale tile layer -->
-      const stadiaApiKey = "2c123743-986c-4ecb-b344-8365391f30f3"
+       // <!-- Grayscale tile layer from https://leaflet-extras.github.io/leaflet-providers/preview/ -->
+       const stadiaApiKey = "2c123743-986c-4ecb-b344-8365391f30f3"
       var Stadia_AlidadeSmoothDark = L.tileLayer(
         "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}",
         {
