@@ -68,7 +68,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="well">PICTURE</div>
+                        <div id="pic"></div>
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                 <div id="bar"></div>
             </div>
             <div class="col-md-6">
-                <div class="well">PLOT</div>
+                <div id="line"></div>
             </div>
         </div>
     </div>
@@ -109,7 +109,7 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
-    bird = "Bald Eagle"
+    bird = "Scarlet Tanager"
     d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
         let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
         for (item of data) {
@@ -122,12 +122,11 @@
         };
         let traces1 = [trace1];
         let layout1 = {
-            title: `${bird} Obseravtions by Month`
+            title: `${bird} Observations by Month`
         };
         Plotly.newPlot("bar",traces1,layout1);
     });
-    d3.json("http://127.0.0.1:5000/api/v1.0/metadata_by_name/Bald%20Eagle").then((data)=>{
-        console.log(data);
+    d3.json(`http://127.0.0.1:5000/api/v1.0/metadata_by_name/${bird}`).then((data)=>{
         metaStrings = [];
         metaDict = {"Common Name":data[0].COMMON_NAME,
         "Scientific Name":data[0].SCIENTIFIC_NAME,
@@ -147,6 +146,32 @@
         // push output string to html file using innerHTML
         document.getElementById("sample-metadata").innerHTML = metaString;
     })
+    const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+        let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
+        let yearList = Object.keys(groupData);
+        let toCountList = Object.values(groupData);
+        let countList = [];
+        for (item of toCountList) {
+            countList.push(item.length);
+        }
+        let trace2 = {
+            x: yearList,
+            y: countList,
+            type: "line"
+        };
+        let traces2 = [trace2];
+        let layout2 = {
+            title: `Total ${bird} Observations by Year`
+        };
+        Plotly.newPlot("line",traces2,layout2);
+    var elem = document.createElement("img");
+    elem.setAttribute("height", "288");
+    elem.setAttribute("width", "384");
+    //elem.setAttribute("src", "birdinfo/dunlin-IanDavies-MacaulayLibrary.jpg");
+    elem.src = `../birdinfo/birdpics/${bird}.jpg`;
+    document.getElementById("pic").appendChild(elem);
+    });
 </script>
 </body>
 </html>
