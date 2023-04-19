@@ -2,11 +2,36 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>TEST HTML</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TEST HTML</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <!-- D3
+    <script src="https://d3js.org/d3.v5.min.js"></script> -->
+
+    <!-- Leaflet CSS from https://leafletjs.com/download.html  -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+      crossorigin=""
+    ></script>
+
+    <!-- Leaflet JavaScript code -->
+    <script
+      src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
+      integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
+      crossorigin=""
+    ></script>
+
+    <!-- Our CSS -->
+    <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
@@ -22,24 +47,18 @@
             <div class="col-md-2">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="well">METADATA
-                            <br>
-                            <br>
-                            <br>
-                            <br>
-                            <br>
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                              <h3 class="panel-title"> Bird Metadata</h3>
+                            </div>
+                            <div id="sample-metadata" class="panel-body">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-8">
-                    <div class="well">MAP
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                    </div>
+                <div id="map"></div>
             </div>
             <div class="col-md-2">
                 <div class="row">
@@ -56,7 +75,7 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="well">PLOT</div>
+                <div id="bar"></div>
             </div>
             <div class="col-md-6">
                 <div class="well">PLOT</div>
@@ -64,11 +83,71 @@
         </div>
     </div>
 
+<!-- Map Script -->
+<script>
+    var map = L.map("map").setView({ lat: 48.1667, lng: -100.1800 }, 3.5);
+
+    // <!-- Grayscale tile layer from https://leaflet-extras.github.io/leaflet-providers/preview/ -->
+    const stadiaApiKey = "2c123743-986c-4ecb-b344-8365391f30f3"
+    var Stadia_AlidadeSmoothDark = L.tileLayer(
+        "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}",
+        {
+        maxZoom: 20,
+        apiKey : stadiaApiKey,
+        attribution:
+            '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        }
+    );
+    Stadia_AlidadeSmoothDark.addTo(map);
+</script>
+<!-- D3  Javascript-->
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<!-- Our Javascript file-->
+<script type = "text/javascript" src="leaflet-starter.js"></script>
+
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="./static/js/app.js"></script>
-<script src="./static/js/bonus.js"></script>
-  
-</body>
 
+<script>
+    bird = "Bald Eagle"
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+        let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        for (item of data) {
+            monthCounts[item.OBSERVATION_MONTH-1]++;
+        }
+        let trace1 = {
+            x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            y: monthCounts,
+            type: "bar"
+        };
+        let traces1 = [trace1];
+        let layout1 = {
+            title: `${bird} Obseravtions by Month`
+        };
+        Plotly.newPlot("bar",traces1,layout1);
+    });
+    d3.json("http://127.0.0.1:5000/api/v1.0/metadata_by_name/Bald%20Eagle").then((data)=>{
+        console.log(data);
+        metaStrings = [];
+        metaDict = {"Common Name":data[0].COMMON_NAME,
+        "Scientific Name":data[0].SCIENTIFIC_NAME,
+        "Status in Illinois":data[0].STATUS_IN_ILLINOIS,
+        "Average Length":data[0].LENGTH,
+        "Average Weight":data[0].WEIGHT,
+        "Average Wingspan":data[0].WINGSPAN,
+        "Habitat":data[0].HABITAT,
+        "Diet":data[0].FOOD,
+        "Typical Behavior":data[0].BEHAVIOR,
+        "Clutch Size":data[0].CLUTCH_SIZE}
+        Object.entries(metaDict).forEach(([key, value]) => {
+                metaStrings.push(`<b>${key}:</b><br/>${value}`);
+        });
+        // use metaStrings to build output string for html file
+        let metaString = `${metaStrings[0]}<br/>${metaStrings[1]}<br/>${metaStrings[2]}<br/>${metaStrings[3]}<br/>${metaStrings[4]}<br/>${metaStrings[5]}<br/>${metaStrings[6]}<br/>${metaStrings[7]}<br/>${metaStrings[8]}<br/>${metaStrings[9]}`;
+        // push output string to html file using innerHTML
+        document.getElementById("sample-metadata").innerHTML = metaString;
+    })
+</script>
+</body>
 </html>
+
