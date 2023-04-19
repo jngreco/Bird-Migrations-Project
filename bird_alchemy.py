@@ -43,6 +43,16 @@ def welcome():
         f"/api/v1.0/all_data_dates/start/end<br/>"
     )
 
+####
+#DATE RANGE STRINGS
+#2015: 2015-01-01/2015-12-31
+#2016: 2016-01-01/2016-12-31
+#2017: 2017-01-01/2017-12-31
+#2018: 2018-01-01/2018-12-31
+#2019: 2019-01-01/2019-12-31
+#2020: 2020-01-01/2020-12-31
+####
+
 # Helper function to convert SQL Alchemy ORM rows to dictionaries
 def object_as_dict(row):
     result = {}
