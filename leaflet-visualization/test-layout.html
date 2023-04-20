@@ -65,18 +65,18 @@
                     <div class="col-md-12">
                         <div id="box">Bird Selector
                             <select id="selDataset">
-                                <option value="dataset1">Bald Eagle</option>
-                                <option value="dataset1">Black-Bellied Plover</option>
-                                <option value="dataset1">Black-Crowned Night Heron</option>
-                                <option value="dataset1">Double-Crested Cormorant</option>
-                                <option value="dataset1">Dunlin</option>
-                                <option value="dataset1">Great Horned Owl</option>
-                                <option value="dataset1">Indigo Bunting</option>
-                                <option value="dataset1">Northern Harrier</option>
-                                <option value="dataset1">Red-Headed Woodpecker</option>
-                                <option value="dataset1">Scarlet Tanager</option>
-                                <option value="dataset1">Snowy Owl</option>
-                                <option value="dataset1">Worm-Eating Warbler</option>
+                                <option value="Bald Eagle">Bald Eagle</option>
+                                <option value="Black-bellied Plover">Black-bellied Plover</option>
+                                <option value="Black-crowned Night-Heron">Black-crowned Night-Heron</option>
+                                <option value="Double-crested Cormorant">Double-crested Cormorant</option>
+                                <option value="Dunlin">Dunlin</option>
+                                <option value="Great Horned Owl">Great Horned Owl</option>
+                                <option value="Indigo Bunting">Indigo Bunting</option>
+                                <option value="Northern Harrier">Northern Harrier</option>
+                                <option value="Red-headed Woodpecker">Red-headed Woodpecker</option>
+                                <option value="Scarlet Tanager">Scarlet Tanager</option>
+                                <option value="Snowy Owl">Snowy Owl</option>
+                                <option value="Worm-eating Warbler">Worm-eating Warbler</option>
                             </select>
                         </div>
                     </div>
@@ -88,14 +88,6 @@
                             <br>
                             <br>
                             <br>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div id="box">
-                            <br>
-                            Photo attribution
                         </div>
                     </div>
                 </div>
@@ -130,6 +122,16 @@
 </script>
 
 
+
+<!-- D3  Javascript-->
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<!-- Our Javascript file-->
+<script type = "text/javascript" src="leaflet-starter.js"></script>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
 <style>
     #box {
       display: flex;
@@ -139,32 +141,12 @@
       border: 1px solid green;
     }
 </style>
-<!-- D3  Javascript-->
-<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
-<!-- Our Javascript file-->
-<script type = "text/javascript" src="leaflet-starter.js"></script>
-
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
-    bird = "Bald Eagle"
-    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
-        let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
-        for (item of data) {
-            monthCounts[item.OBSERVATION_MONTH-1]++;
-        }
-        let trace1 = {
-            x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            y: monthCounts,
-            type: "bar"
-        };
-        let traces1 = [trace1];
-        let layout1 = {
-            title: `${bird} Observations by Month`
-        };
-        Plotly.newPlot("bar",traces1,layout1);
-    });
+    // Webpage Initialization with default selection "Bald Eagle"
+    let bird = "Bald Eagle";
+
+    // Populate metadata table
     d3.json(`http://127.0.0.1:5000/api/v1.0/metadata_by_name/${bird}`).then((data)=>{
         metaStrings = [];
         metaDict = {"Common Name":data[0].COMMON_NAME,
@@ -184,8 +166,39 @@
         let metaString = `${metaStrings[0]}<br/>${metaStrings[1]}<br/>${metaStrings[2]}<br/>${metaStrings[3]}<br/>${metaStrings[4]}<br/>${metaStrings[5]}<br/>${metaStrings[6]}<br/>${metaStrings[7]}<br/>${metaStrings[8]}<br/>${metaStrings[9]}`;
         // push output string to html file using innerHTML
         document.getElementById("sample-metadata").innerHTML = metaString;
-    })
+    });
+
+    // Add photo attribution
+    var photographer = "Scott Hedorn";
+    // Add bird image
+    var elem = document.createElement("img");
+    elem.setAttribute("height", "288");
+    elem.setAttribute("width", "384");
+    elem.setAttribute("title",`${bird} - ${photographer} for Macaulay Library`)
+    elem.src = `../birdinfo/birdpics/${bird}.jpg`;
+    document.getElementById("pic").appendChild(elem);
+
+    // Create bar chart of observations by month
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+        let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        for (item of data) {
+            monthCounts[item.OBSERVATION_MONTH-1]++;
+        }
+        let trace1 = {
+            x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            y: monthCounts,
+            type: "bar"
+        };
+        let traces1 = [trace1];
+        let layout1 = {
+            title: `${bird} Observations by Month in 2022`
+        };
+        Plotly.newPlot("bar",traces1,layout1);
+    });
+    
+    // Define groupby function observations by year plot
     const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+    // Create line plot of observations by year
     d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
         let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
         let yearList = Object.keys(groupData);
@@ -201,16 +214,120 @@
         };
         let traces2 = [trace2];
         let layout2 = {
-            title: `Total ${bird} Observations by Year`
+            title: `${bird} Observations by Year`
         };
         Plotly.newPlot("line",traces2,layout2);
-    var elem = document.createElement("img");
-    elem.setAttribute("height", "288");
-    elem.setAttribute("width", "384");
-    //elem.setAttribute("src", "birdinfo/dunlin-IanDavies-MacaulayLibrary.jpg");
-    elem.src = `../birdinfo/birdpics/${bird}.jpg`;
-    document.getElementById("pic").appendChild(elem);
+
     });
+
+    // On change to the drop-down, call getData()
+    d3.selectAll("#selDataset").on("change", getData);
+    // Reload website with selected bird
+    function getData() {
+        let dropdownMenu = d3.select("#selDataset");
+        // Assign the value of the dropdown menu option to a letiable
+        let bird = dropdownMenu.property("value");
+
+        // Populate metadata table
+        d3.json(`http://127.0.0.1:5000/api/v1.0/metadata_by_name/${bird}`).then((data)=>{
+            metaStrings = [];
+            metaDict = {"Common Name":data[0].COMMON_NAME,
+            "Scientific Name":data[0].SCIENTIFIC_NAME,
+            "Status in Illinois":data[0].STATUS_IN_ILLINOIS,
+            "Average Length":data[0].LENGTH,
+            "Average Weight":data[0].WEIGHT,
+            "Average Wingspan":data[0].WINGSPAN,
+            "Habitat":data[0].HABITAT,
+            "Diet":data[0].FOOD,
+            "Typical Behavior":data[0].BEHAVIOR,
+            "Clutch Size":data[0].CLUTCH_SIZE}
+            Object.entries(metaDict).forEach(([key, value]) => {
+                    metaStrings.push(`<b>${key}:</b><br/>${value}`);
+            });
+            // use metaStrings to build output string for html file
+            let metaString = `${metaStrings[0]}<br/>${metaStrings[1]}<br/>${metaStrings[2]}<br/>${metaStrings[3]}<br/>${metaStrings[4]}<br/>${metaStrings[5]}<br/>${metaStrings[6]}<br/>${metaStrings[7]}<br/>${metaStrings[8]}<br/>${metaStrings[9]}`;
+            // push output string to html file using innerHTML
+            document.getElementById("sample-metadata").innerHTML = metaString;
+        });
+
+        // Add photo attribution
+        if (bird == "Bald Eagle") {
+            var photographer = "Scott Hedorn";
+        }
+        else if (bird == "Black-bellied Plover") {
+            var photographer = "Matt Davis";
+        }
+        else if (bird == "Black-crowned Night-Heron") {
+            var photographer = "Melissa James";
+        }
+        else if (bird == "Double-crested Cormorant") {
+            var photographer = "Evan Lipton";
+        }
+        else if (["Dunlin", "Snowy Owl"].includes(bird)) {
+            var photographer = "Ian Davies";
+        }
+        else if (bird == "Great Horned Owl") {
+            var photographer = "Mary Rumple";
+        }
+        else if (bird == "Indigo Bunting") {
+            var photographer = "Daniel Irons";
+        }
+        else if (bird == "Northern Harrier") {
+            var photographer = "Song Yu";
+        }
+        else if (["Red-headed Woodpecker", "Scarlet Tanager"].includes(bird)) {
+            var photographer = "Ryan Sanderson";
+        }
+        else if (bird == "Worm-eating Warbler") {
+            var photographer = "Jeremiah Trimble";
+        }
+
+        // Update displayed image
+        var parent = document.getElementById('pic');
+        var currentImage = parent.querySelector('img');
+        currentImage.src = `../birdinfo/birdpics/${bird}.jpg`;
+        currentImage.title = `${bird} - ${photographer} for Macaulay Library`;
+
+        // Add bar chart
+        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+            let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+            for (item of data) {
+                monthCounts[item.OBSERVATION_MONTH-1]++;
+            }
+            let trace1 = {
+                x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                y: monthCounts,
+                type: "bar"
+            };
+            let traces1 = [trace1];
+            let layout1 = {
+                title: `${bird} Observations by Month in 2022`
+            };
+            Plotly.newPlot("bar",traces1,layout1);
+        });
+        
+        // Add line plot
+        const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+            let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
+            let yearList = Object.keys(groupData);
+            let toCountList = Object.values(groupData);
+            let countList = [];
+            for (item of toCountList) {
+                countList.push(item.length);
+            }
+            let trace2 = {
+                x: yearList,
+                y: countList,
+                type: "line"
+            };
+            let traces2 = [trace2];
+            let layout2 = {
+                title: `${bird} Observations by Year`
+            };
+            Plotly.newPlot("line",traces2,layout2);
+        });
+    }
 </script>
 </body>
 </html>
