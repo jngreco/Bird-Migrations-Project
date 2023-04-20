@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TEST LAYOUT MAP</title>
+    <title>AutoBirdBrain</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
       <!-- D3
@@ -89,7 +89,7 @@
                         
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title"> Bird Metadata</h3>
+                        <h3 class="panel-title"><span id="myText"></span> Metadata</h3>
                     </div>
                     <div id="sample-metadata" class="panel-body">
                     </div>
@@ -131,6 +131,32 @@
 <script>
     // Webpage Initialization with default selection "Bald Eagle"
     let bird = "Bald Eagle";
+    document.getElementById("myText").innerHTML = bird;
+
+    // Define groupby function observations by year plot
+    const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+    // Create line plot of observations by year
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+        let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
+        let yearList = Object.keys(groupData);
+        let toCountList = Object.values(groupData);
+        let countList = [];
+        for (item of toCountList) {
+            countList.push(item.length);
+        }
+        let trace2 = {
+            x: yearList,
+            y: countList,
+            type: "line"
+        };
+        let traces2 = [trace2];
+        let layout2 = {
+            title: `${bird}<br>Observations by Year`
+            //title: `Observations by Year`
+        };
+        Plotly.newPlot("line",traces2,layout2);
+
+    });
 
     // Populate metadata table
     d3.json(`http://127.0.0.1:5000/api/v1.0/metadata_by_name/${bird}`).then((data)=>{
@@ -177,36 +203,12 @@
         };
         let traces1 = [trace1];
         let layout1 = {
-            //title: `${bird} Observations by Month in 2022`
-            title: `Observations by Month in 2022`
+            title: `${bird}<br>Observations by Month in 2022`
+            //title: `Observations by Month in 2022`
         };
         Plotly.newPlot("bar",traces1,layout1);
     });
 
-    // Define groupby function observations by year plot
-    const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
-    // Create line plot of observations by year
-    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
-        let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
-        let yearList = Object.keys(groupData);
-        let toCountList = Object.values(groupData);
-        let countList = [];
-        for (item of toCountList) {
-            countList.push(item.length);
-        }
-        let trace2 = {
-            x: yearList,
-            y: countList,
-            type: "line"
-        };
-        let traces2 = [trace2];
-        let layout2 = {
-            //title: `${bird} Observations by Year`
-            title: `Observations by Year`
-        };
-        Plotly.newPlot("line",traces2,layout2);
-
-    });
 
     // On change to the drop-down, call getData()
     d3.selectAll("#selDataset").on("change", getData);
@@ -215,6 +217,30 @@
         let dropdownMenu = d3.select("#selDataset");
         // Assign the value of the dropdown menu option to a letiable
         let bird = dropdownMenu.property("value");
+        document.getElementById("myText").innerHTML = bird;
+
+        // Add line plot
+        const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
+        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+            let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
+            let yearList = Object.keys(groupData);
+            let toCountList = Object.values(groupData);
+            let countList = [];
+            for (item of toCountList) {
+                countList.push(item.length);
+            }
+            let trace2 = {
+                x: yearList,
+                y: countList,
+                type: "line"
+            };
+            let traces2 = [trace2];
+            let layout2 = {
+                        title: `${bird}<br>Observations by Year`
+                    //title: `Observations by Year`
+            };
+            Plotly.newPlot("line",traces2,layout2);
+        });
 
         // Populate metadata table
         d3.json(`http://127.0.0.1:5000/api/v1.0/metadata_by_name/${bird}`).then((data)=>{
@@ -289,34 +315,73 @@
             };
             let traces1 = [trace1];
             let layout1 = {
-                //title: `${bird} Observations by Month in 2022`
-                title: `Observations by Month in 2022`
+                title: `${bird}<br>Observations by Month in 2022`
+                //title: `Observations by Month in 2022`
             };
             Plotly.newPlot("bar",traces1,layout1);
         });
         
-        // Add line plot
-        const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
-    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
-        let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
-        let yearList = Object.keys(groupData);
-        let toCountList = Object.values(groupData);
-        let countList = [];
-        for (item of toCountList) {
-            countList.push(item.length);
-        }
-        let trace2 = {
-            x: yearList,
-            y: countList,
-            type: "line"
-        };
-        let traces2 = [trace2];
-        let layout2 = {
-                // title: `${bird} Observations by Year`
-                title: `Observations by Year`
-        };
-        Plotly.newPlot("line",traces2,layout2);
-    });
+
+        // ATTEMPT TO CLEAR MARKERS and regenerate map
+        var birdMap 
+        let base_url = 'http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/'
+        let dates_url = '/2023-01-01/2023-03-31'
+        let full_url = base_url + bird + dates_url
+
+        d3.json(full_url).then(function(response) {
+            console.log(response);
+            map.eachLayer(function(layer) {
+                map.removeLayer(layer);
+            });
+            Stadia_AlidadeSmoothDark.addTo(map);
+            //create a new marker cluster group
+            var markers = L.markerClusterGroup({
+            iconCreateFunction: function(cluster) {
+                var childCount = cluster.getChildCount();
+                var clusterClass = 'marker-cluster-small';
+                if (childCount > 50) {
+                clusterClass = 'marker-cluster-medium';
+                }
+                if (childCount > 150) {
+                clusterClass = 'marker-cluster-large';
+                }
+                if (childCount > 300) {
+                clusterClass = 'marker-cluster-xlarge';
+                }
+                if (childCount > 500) {
+                clusterClass = 'marker-cluster-xxlarge';
+                }
+                if (childCount > 900) {
+                clusterClass = 'marker-cluster-xxxlarge';
+                }
+                return L.divIcon({
+                html: '<div><span>' + childCount + '</span></div>',
+                className: 'marker-cluster ' + clusterClass,
+                iconSize: new L.Point(40, 40),
+                iconAnchor: new L.Point(20, 20),
+                style: 'background-color: #FF7308; border-radius: 50%; text-align: center; font-weight: bold; font-size: 16px;'
+                });
+            }
+            });
+            console.log(markers);
+            //loop through the data
+            for (var i = 0; i<response.length; i++){
+            //set the data location propert to a variable
+            var location = response[i];
+            
+            if (location){
+                //console.log(location);
+                //add marker to the new cluster group, and bind a popup
+                
+                markers.addLayer(L.marker([location.LATITUDE, location.LONGITUDE])
+                .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
+            }
+
+            }
+            map.addLayer(markers);
+            map.setView({ lat: 39.8675979, lng: -89.6324862 }, 7);
+            
+        });
     }
 </script>
 
@@ -345,7 +410,7 @@
      <!-- D3  Javascript-->
      <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
      <!-- Our Javascript file-->
-     <script type = "text/javascript" src="leaflet-starter.js"></script>
+     <script type = "text/javascript" src="leaflet-starter copy.js"></script>
 </body>
 </html>
 
