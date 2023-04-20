@@ -1,4 +1,4 @@
-/* Define the marker cluster styles for different sizes */
+/* Custom cluster colors by number of markers contained within a cluster */
 .marker-cluster-small {
     background-color: #FFDF00;
     border-radius: 50%;
