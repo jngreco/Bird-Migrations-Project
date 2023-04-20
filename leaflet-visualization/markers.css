@@ -1,0 +1,27 @@
+var colorScale = d3.scaleLinear()
+  .domain([0, 50, 200, 500, 700, 1000])
+  .range(["#FFDF00", "#ED872D", "#C66F44", "#9F585B", "#784072", "#512889"]);
+
+  
+
+
+  /* Define the marker cluster styles for different sizes */
+.marker-cluster-small {
+    background-color: #FFDF00;
+  }
+  .marker-cluster-medium {
+    background-color: #ED872D;
+  }
+  .marker-cluster-large {
+    background-color: #C66F44;
+  }
+  .marker-cluster-xlarge {
+    background-color: #9F585B;
+  }
+  .marker-cluster-xxlarge {
+    background-color: #784072;
+  }
+  .marker-cluster-xxxlarge {
+    background-color: #512889;
+  }
+  
