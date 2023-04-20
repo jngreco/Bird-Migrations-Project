@@ -143,7 +143,7 @@
     }
     #b {
       flex-grow: 100;
-      border: 1px solid green;
+      border: 5px solid green;
     }
 </style> 
 
@@ -270,12 +270,23 @@
             x: yearList,
             y: countList,
             type: "line",
-            marker: { color: '#d77a39'}
+            marker: { color: '#ED872D'},
+            line: {
+                width: 8,
+            }
         };
         let traces2 = [trace2];
         let layout2 = {
-            title: `${bird}<br>Observations by Year`
-            //title: `Observations by Year`
+            title: `${bird}<br>Observations by Year`,
+            xaxis: {
+                title: 'Year'
+            },
+            yaxis: {
+                title: 'Number of Observations'
+            },
+            plot_bgcolor: '#ffffff', // border color
+            paper_bgcolor: '#f2f2f2', // background color
+            borderwidth: 25 // border width 
         };
         Plotly.newPlot("line",traces2,layout2);
 
@@ -326,12 +337,21 @@
             x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             y: monthCounts,
             type: "bar",
-            marker: { color: '#d77a39'}
+            marker: { color: '#ED872D'}
         };
         let traces1 = [trace1];
         let layout1 = {
             //title: `${bird}<br>Observations by Month in 2022`
-            title: `${bird}<br>Observations by Month - ${startDate} - ${endDate}`
+            title: `${bird}<br>Observations by Month - ${startDate} - ${endDate}`,
+            xaxis: {
+                title: 'Month'
+            },
+            yaxis: {
+                title: 'Number of Observations'
+            },
+            plot_bgcolor: '#ffffff', // border color
+            paper_bgcolor: '#f2f2f2', // background color
+            borderwidth: 25
         };
         Plotly.newPlot("bar",traces1,layout1);
     });
@@ -561,7 +581,7 @@
                 if (location){
                     //add marker to the new cluster group, and bind a popup
                     markers.addLayer(L.marker([location.LATITUDE, location.LONGITUDE])
-                    .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE + '<br/>' + location['OBSERVATION_DATE'] + ' ' + location['TIME_OBSERVATIONS_STARTED'] ));
+                    .bindPopup(`<h3><strong>Species:</strong> ${location['COMMON_NAME']}</h3><hr><p>Location: ${location.LATITUDE}, ${location.LONGITUDE}</p><p> Date Observed: ${location['OBSERVATION_DATE']}</p><p> Time Observed: ${location['TIME_OBSERVATIONS_STARTED']}</p>`));
                     //.bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE + '<br/>' + location['OBSERVATION_DATE'] ));
                     //.bindPopup(location['COMMON_NAME'] + '<br/>' + location['OBSERVATION_DATE'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
                     //.bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
