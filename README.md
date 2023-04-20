@@ -6,6 +6,23 @@
 ## Project Summary
 We want to explore bird migration patterns, with a focus on endangered species in the midwest. Using publicly available data, we will create visualizations of bird populations over time.
 
+The practical objective was to find a large dataset, convert it into a CSV, clean the data and populate a SQLite database. Then create a Flask app server to return webpage queries. Finally, creating an interactive weboage, using HTML, JavaScript, and CSS stylesheets to present the user-filtered data in a dynamic, accurate, and visually pleasing format.
+
+This project hinges on the communication and interaction between several independent components. The applications, libraries and tools that we used include:
+- Applications
+  - SQLite
+  - Jupyter Lab
+  - Excel
+  - Flask
+
+- Libraries
+  - jquery
+  - Bootstrap
+  - Leaflet
+  - StadiaMaps
+  - D3
+
+
 Repo Link: https://github.com/jngreco/bird-migrations-project 
 
 ### Data Sources:
