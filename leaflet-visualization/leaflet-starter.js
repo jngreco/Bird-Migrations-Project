@@ -15,16 +15,16 @@ d3.json(full_url).then(function(response) {
       if (childCount > 50) {
         clusterClass = 'marker-cluster-medium';
       }
-      if (childCount > 200) {
+      if (childCount > 150) {
         clusterClass = 'marker-cluster-large';
       }
-      if (childCount > 500) {
+      if (childCount > 300) {
         clusterClass = 'marker-cluster-xlarge';
       }
-      if (childCount > 700) {
+      if (childCount > 500) {
         clusterClass = 'marker-cluster-xxlarge';
       }
-      if (childCount > 1000) {
+      if (childCount > 900) {
         clusterClass = 'marker-cluster-xxxlarge';
       }
       return L.divIcon({
@@ -32,7 +32,7 @@ d3.json(full_url).then(function(response) {
         className: 'marker-cluster ' + clusterClass,
         iconSize: new L.Point(40, 40),
         iconAnchor: new L.Point(20, 20),
-        style: 'text-align: center; font-weight: bold; font-size: 16px;'
+        style: 'background-color: #FF7308; border-radius: 50%; text-align: center; font-weight: bold; font-size: 16px;'
       });
     }
   });
