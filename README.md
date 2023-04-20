@@ -25,11 +25,8 @@ This project hinges on the communication and interaction between several indepen
 
 Repo Link: https://github.com/jngreco/bird-migrations-project 
 
-### Data Sources:
-- eBird API : https://documenter.getpostman.com/view/664302/S1ENwy59#intro 
+### Data Sources and References:
 - Visualization examples : https://science.ebird.org/en/status-and-trends 
-- Illinois Audubon Society : https://illinoisaudubon.org/springmigrationdashboard/ 
-- Birdcast : https://dashboard.birdcast.info/region/US-IL-031 
 - eBird overview page: https://science.ebird.org/en/status-and-trends
 - eBird abundance animations: 
   - https://science.ebird.org/en/status-and-trends/abundance-animations 
