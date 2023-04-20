@@ -63,12 +63,40 @@
             <div class="col-md-2">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="well">DROPDOWN</div>
+                        <div id="box">Bird Selector
+                            <select id="selDataset">
+                                <option value="dataset1">Bald Eagle</option>
+                                <option value="dataset1">Black-Bellied Plover</option>
+                                <option value="dataset1">Black-Crowned Night Heron</option>
+                                <option value="dataset1">Double-Crested Cormorant</option>
+                                <option value="dataset1">Dunlin</option>
+                                <option value="dataset1">Great Horned Owl</option>
+                                <option value="dataset1">Indigo Bunting</option>
+                                <option value="dataset1">Northern Harrier</option>
+                                <option value="dataset1">Red-Headed Woodpecker</option>
+                                <option value="dataset1">Scarlet Tanager</option>
+                                <option value="dataset1">Snowy Owl</option>
+                                <option value="dataset1">Worm-Eating Warbler</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="pic"></div>
+                        <div id="pic">
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="box">
+                            <br>
+                            Photo attribution
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,6 +128,17 @@
     );
     Stadia_AlidadeSmoothDark.addTo(map);
 </script>
+
+
+<style>
+    #box {
+      display: flex;
+    }
+    #b {
+      flex-grow: 100;
+      border: 1px solid green;
+    }
+</style>
 <!-- D3  Javascript-->
 <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
 <!-- Our Javascript file-->
@@ -109,7 +148,7 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
-    bird = "Scarlet Tanager"
+    bird = "Bald Eagle"
     d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
         let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
         for (item of data) {
