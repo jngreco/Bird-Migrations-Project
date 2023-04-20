@@ -4,13 +4,32 @@ body {
 }
 
 #map {
-  width: 700px;
+  /* width: 640px; */
   height: 700px;
 }
 
 body,
 html {
+  /* Since the map tile color is "#333333", let's choose a background color that's compatible. */
+  background-color: #444444;
   height: 100%; 
+}
+
+/* Panel Styling */
+.panel-primary {
+  border-color: #333333;
+}
+.panel-primary .panel-heading {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+#box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* font-size: 14px; */
+  /* vertical-align: text-bottom; */
 }
 
 /* LEGEND STYLING */

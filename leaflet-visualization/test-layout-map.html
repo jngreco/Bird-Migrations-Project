@@ -8,8 +8,8 @@
     <title>AutoBirdBrain</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-      <!-- D3
-    <script src="https://d3js.org/d3.v5.min.js"></script> -->
+    <!-- jquery CSS stylesheet for slider -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <!-- Leaflet CSS from https://leafletjs.com/download.html  -->
     <link
@@ -48,6 +48,10 @@
      <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.css">
      <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.Default.css">
 
+     <!-- JQuery code for our slider -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <!-- Our CSS -->
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
@@ -58,35 +62,39 @@
         <!-- First row -->
         <div class="row">
             <div class="col-md-12 jumbotron text-center">
-                <h3>Migration Data for Birds</h3>
-                <p>Some birds are endangered.  Some are vulnerable.  Some are migratory.  This page shows 
-                   where selected bird species have been sighted, along with frequency of sightings and 
-                   what month they've been sighted.  
-                </p>
+                <h3>Bird Migration Data</h3>
+                <p>This page shows where selected bird species have been sighted, along with frequency of sightings by month and 
+                    the number of observations by year. </p>
             </div>
         </div>
 
         <!-- Second row -->
         <div class="row">
             <div class="col-md-4">
-                <div id="box">Bird Selector:  
-                    <select id="selDataset">
-                        <option value="Bald Eagle">Bald Eagle</option>
-                        <option value="Black-bellied Plover">Black-bellied Plover</option>
-                        <option value="Black-crowned Night-Heron">Black-crowned Night-Heron</option>
-                        <option value="Double-crested Cormorant">Double-crested Cormorant</option>
-                        <option value="Dunlin">Dunlin</option>
-                        <option value="Great Horned Owl">Great Horned Owl</option>
-                        <option value="Indigo Bunting">Indigo Bunting</option>
-                        <option value="Northern Harrier">Northern Harrier</option>
-                        <option value="Red-headed Woodpecker">Red-headed Woodpecker</option>
-                        <option value="Scarlet Tanager">Scarlet Tanager</option>
-                        <option value="Snowy Owl">Snowy Owl</option>
-                        <option value="Worm-eating Warbler">Worm-eating Warbler</option>
-                    </select>
+                <div class="panel panel-primary">
+                    <div id="box">&nbsp;Select a bird species:&nbsp;  
+                        <select id="selDataset">
+                            <option value="Bald Eagle">Bald Eagle</option>
+                            <option value="Black-bellied Plover">Black-bellied Plover</option>
+                            <option value="Black-crowned Night-Heron">Black-crowned Night-Heron</option>
+                            <option value="Double-crested Cormorant">Double-crested Cormorant</option>
+                            <option value="Dunlin">Dunlin</option>
+                            <option value="Great Horned Owl">Great Horned Owl</option>
+                            <option value="Indigo Bunting">Indigo Bunting</option>
+                            <option value="Northern Harrier">Northern Harrier</option>
+                            <option value="Red-headed Woodpecker">Red-headed Woodpecker</option>
+                            <option value="Scarlet Tanager">Scarlet Tanager</option>
+                            <option value="Snowy Owl">Snowy Owl</option>
+                            <option value="Worm-eating Warbler">Worm-eating Warbler</option>
+                        </select>
+                    </div>
                 </div>
-                <br></br>
-                        
+                <div class="panel panel-primary">
+                    <div id="date-range-slider"></div>
+                    <p>
+                        &nbsp; Selected date range: <span id="selected-start-date"></span> - <span id="selected-end-date"></span>
+                    </p>
+                </div>
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span id="myText"></span> Metadata</h3>
@@ -94,22 +102,30 @@
                     <div id="sample-metadata" class="panel-body">
                     </div>
                 </div>
+
+                <div class="panel panel-primary">
+                    <div id="pic"></div>
+                </div>
+
             </div>
 
             <div class="col-md-8">
-                <div id="map"></div>
+                <div class="panel panel-primary">
+                    <div id="map"></div>
+                </div>
             </div>
 
         <!-- Third Row -->
         <div class="row">
-            <div class="col-md-4">
-                <div id="pic"></div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div id="bar"></div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <div id="bar"></div>
-            </div>
-            <div class="col-md-4">
-                <div id="line"></div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div id="line"></div>
+                </div>
             </div>
         </div>
 </div>
@@ -118,7 +134,7 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 
-<style>
+ <style>
     #box {
       display: flex;
     }
@@ -126,17 +142,120 @@
       flex-grow: 100;
       border: 1px solid green;
     }
-</style>
+</style> 
 
 <script>
+
+    // Helper function to convert date into yyyy-mm-dd format:
+    function formatDate(date) {
+        console.log("date before formatting = ", date)
+
+        var year = date.getUTCFullYear();
+        var month = date.getUTCMonth() + 1; // Months are 0-based, so we need to add 1
+        var day = date.getUTCDate();
+    
+        // Pad the month and day with leading zeros, if necessary
+        month = (month < 10 ? "0" : "") + month;
+        day = (day < 10 ? "0" : "") + day;
+    
+        console.log("date after formatting = ", year + "-" + month + "-" + day);
+        return year + "-" + month + "-" + day;
+
+    }
+
+    // Main slider function
+    $(function() {
+
+        // Initialize the displayed dates
+        var initialStartDate = new Date(Date.UTC(1970, 0, 1));
+        var initialEndDate = new Date(Date.UTC(2022, 11, 31));
+
+        $("#date-range-slider").slider({
+            range: true,
+            // Updated to use UTC dates ...
+            min: new Date(Date.UTC(1970, 0, 1)).getTime() / 1000, // Start UTC date for the slider
+            max: new Date(Date.UTC(2023, 11, 31)).getTime() / 1000, // End UTC date for the slider
+            step: 31536000, // One year in seconds
+            //values: [new Date(Date.UTC(1970, 0, 1)).getTime() / 1000, new Date(Date.UTC(2022, 11, 31)).getTime() / 1000], 
+            values: [initialStartDate.getTime() / 1000, initialEndDate.getTime() / 1000],
+            slide: function(event, ui) {
+                var startDate = new Date(ui.values[0] * 1000);
+                var endDate = new Date(ui.values[1] * 1000);
+                
+                startDate.setUTCMonth(0); // Set month to January (0-based)
+                startDate.setUTCDate(1);   // Set day to 1
+                
+                endDate.setUTCMonth(11); // Set month to December (0-based)
+                endDate.setUTCDate(31);   // Set day to 31
+                
+                updateDisplayedDates(startDate, endDate);
+            },
+            stop: function(event, ui) {
+                var startDate = new Date(ui.values[0] * 1000);
+                var endDate = new Date(ui.values[1] * 1000);
+                
+                startDate.setUTCMonth(0); // Set month to January (0-based)
+                startDate.setUTCDate(1);   // Set day to 1
+                
+                endDate.setUTCMonth(11); // Set month to December (0-based)
+                endDate.setUTCDate(31);   // Set day to 31
+
+                updateDisplayedDates(startDate, endDate);
+
+                console.log("in stop:, startDate =", startDate)
+                console.log("in stop:, endDate =", endDate)
+                
+                // Dispatch custom "change" event using D3
+                d3.select("#date-range-slider").dispatch("daterangechange", {
+                    detail: {
+                        startDate: startDate,
+                        endDate: endDate
+                    }
+                });
+            }
+        });
+
+        // Initialize the displayed dates
+        var initialStartDate = new Date($("#date-range-slider").slider("values", 0) * 1000);
+        var initialEndDate = new Date($("#date-range-slider").slider("values", 1) * 1000);
+        
+        console.log("initialStartDate =", initialStartDate)
+        console.log("initialEndDate =", initialEndDate)
+
+        initialStartDate.setUTCMonth(0); // Set month to January (0-based)
+        initialStartDate.setUTCDate(1);   // Set day to 1
+        
+        initialEndDate.setUTCMonth(11); // Set month to December (0-based)
+        initialEndDate.setUTCDate(31);   // Set day to 31 
+
+        console.log("initialStartDate =", initialStartDate)
+        console.log("initialEndDate =", initialEndDate)
+
+        updateDisplayedDates(initialStartDate, initialEndDate);
+    });
+
+    function filterData(startDate, endDate) {
+        // Implement your filtering logic here
+        console.log("Filter data from", startDate, "to", endDate);
+    }
+
+    function updateDisplayedDates(startDate, endDate) {
+        $("#selected-start-date").text(formatDate(startDate));
+        $("#selected-end-date").text(formatDate(endDate));
+    }
+
     // Webpage Initialization with default selection "Bald Eagle"
     let bird = "Bald Eagle";
+    let startDate = "1970-01-01"
+    let endDate = "2022-12-31"
     document.getElementById("myText").innerHTML = bird;
 
-    // Define groupby function observations by year plot
+    // Define groupby function observations by year plot before selectors have been chosen:
     const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
     // Create line plot of observations by year
-    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+    //d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/${startDate}/${endDate}1`).then((data)=>{
+        console.log("observations by year data =", data);
         let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
         let yearList = Object.keys(groupData);
         let toCountList = Object.values(groupData);
@@ -147,7 +266,8 @@
         let trace2 = {
             x: yearList,
             y: countList,
-            type: "line"
+            type: "line",
+            marker: { color: '#d77a39'}
         };
         let traces2 = [trace2];
         let layout2 = {
@@ -172,7 +292,8 @@
         "Typical Behavior":data[0].BEHAVIOR,
         "Clutch Size":data[0].CLUTCH_SIZE}
         Object.entries(metaDict).forEach(([key, value]) => {
-                metaStrings.push(`<b>${key}:</b><br/>${value}`);
+                //metaStrings.push(`<b>${key}:</b><br/>${value}`);
+                metaStrings.push(`<b>${key}:</b> &nbsp; ${value}`);
         });
         // use metaStrings to build output string for html file
         let metaString = `${metaStrings[0]}<br/>${metaStrings[1]}<br/>${metaStrings[2]}<br/>${metaStrings[3]}<br/>${metaStrings[4]}<br/>${metaStrings[5]}<br/>${metaStrings[6]}<br/>${metaStrings[7]}<br/>${metaStrings[8]}<br/>${metaStrings[9]}`;
@@ -184,14 +305,16 @@
     var photographer = "Scott Hedorn";
     // Add bird image
     var elem = document.createElement("img");
-    elem.setAttribute("height", "288");
-    elem.setAttribute("width", "384");
+    elem.setAttribute("height", "268");
+    elem.setAttribute("width", "358");
     elem.setAttribute("title",`${bird} - ${photographer} for Macaulay Library`)
     elem.src = `../birdinfo/birdpics/${bird}.jpg`;
     document.getElementById("pic").appendChild(elem);
 
-    // Create bar chart of observations by month
-    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+    // Create bar chart of observations by month before selectors have been chosen:
+    //d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2022-12-31`).then((data)=>{
+    d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/${startDate}/${endDate}`).then((data)=>{
+        console.log("observations by month data = ", data);
         let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
         for (item of data) {
             monthCounts[item.OBSERVATION_MONTH-1]++;
@@ -199,29 +322,88 @@
         let trace1 = {
             x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             y: monthCounts,
-            type: "bar"
+            type: "bar",
+            marker: { color: '#d77a39'}
         };
         let traces1 = [trace1];
         let layout1 = {
-            title: `${bird}<br>Observations by Month in 2022`
-            //title: `Observations by Month in 2022`
+            //title: `${bird}<br>Observations by Month in 2022`
+            title: `${bird}<br>Observations by Month - ${startDate} - ${endDate}`
         };
         Plotly.newPlot("bar",traces1,layout1);
     });
 
 
-    // On change to the drop-down, call getData()
-    d3.selectAll("#selDataset").on("change", getData);
-    // Reload website with selected bird
-    function getData() {
-        let dropdownMenu = d3.select("#selDataset");
-        // Assign the value of the dropdown menu option to a letiable
-        let bird = dropdownMenu.property("value");
+    // Function to get updated data when a selector has been updated
+    function handleInputChange(event) {
+        // Get the selected bird from the dropdown menu
+        let bird = d3.select("#selDataset").property("value");
         document.getElementById("myText").innerHTML = bird;
+
+        // Get the selected date range from the slider
+        var startDate = new Date($("#date-range-slider").slider("values", 0) * 1000);
+        var endDate = new Date($("#date-range-slider").slider("values", 1) * 1000);
+
+        console.log("in handleInputChange, startDate = ", startDate)
+        console.log("in handleInputChange, endDate = ", endDate)
+
+        startDate.setUTCMonth(0);
+        startDate.setUTCDate(1);
+
+        endDate.setUTCMonth(0);
+        endDate.setUTCDate(1) - 2;
+
+        console.log("in handleInputChange after setUTCDate, startDate = ", startDate)
+        console.log("in handleInputChange after setUTCDate, endDate = ", endDate)
+
+        // Format the dates before passing them to the getData function
+        var formattedStartDate = formatDate(startDate);
+        var formattedEndDate = formatDate(endDate);
+
+        // Call the getData function with the selected bird and date range
+        console.log("Calling getData with: ", bird, formattedStartDate, formattedEndDate);
+        getData(bird, formattedStartDate, formattedEndDate);
+
+    }
+
+    // On change to the drop-down, call handleInputChange() to update data
+    d3.select("#selDataset").on("change", handleInputChange);
+
+    // We need a delay before triggering rebuild of page, because the slider sends many updates per second:
+    //
+    function debounce(func, wait) {
+        let timeout;
+
+        return function() {
+            const context = this;
+            const args = arguments;
+
+            clearTimeout(timeout);
+
+            timeout = setTimeout(function() {
+                timeout = null;
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+    const debouncedHandleInputChange = debounce(handleInputChange, 500); // 500ms delay
+    d3.select("#date-range-slider").on("daterangechange", debouncedHandleInputChange);
+
+    // Reload page with selected bird
+    //function getData() {
+    function getData(bird, startDate, endDate) {
+        console.log("getData called with:", bird, startDate, endDate)
+        // This is now handled in the handleInputChange() function:
+        //
+        //let dropdownMenu = d3.select("#selDataset");
+        // Assign the value of the dropdown menu option to a letiable
+        //let bird = dropdownMenu.property("value");
+        //document.getElementById("myText").innerHTML = bird;
 
         // Add line plot
         const groupBy = (x,f)=>x.reduce((a,b,i)=>((a[f(b,i,x)]||=[]).push(b),a),{});
-        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+        //d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/1970-01-01/2022-12-31`).then((data)=>{
+        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/${startDate}/${endDate}`).then((data)=>{
             let groupData = groupBy(data, v => v.OBSERVATION_YEAR);
             let yearList = Object.keys(groupData);
             let toCountList = Object.values(groupData);
@@ -232,12 +414,12 @@
             let trace2 = {
                 x: yearList,
                 y: countList,
-                type: "line"
+                type: "line",
+                marker: { color: '#d77a39'}
             };
             let traces2 = [trace2];
             let layout2 = {
-                        title: `${bird}<br>Observations by Year`
-                    //title: `Observations by Year`
+                title: `${bird}<br>Observations by Year`
             };
             Plotly.newPlot("line",traces2,layout2);
         });
@@ -256,7 +438,7 @@
             "Typical Behavior":data[0].BEHAVIOR,
             "Clutch Size":data[0].CLUTCH_SIZE}
             Object.entries(metaDict).forEach(([key, value]) => {
-                    metaStrings.push(`<b>${key}:</b><br/>${value}`);
+                metaStrings.push(`<b>${key}:</b> &nbsp; ${value}`);
             });
             // use metaStrings to build output string for html file
             let metaString = `${metaStrings[0]}<br/>${metaStrings[1]}<br/>${metaStrings[2]}<br/>${metaStrings[3]}<br/>${metaStrings[4]}<br/>${metaStrings[5]}<br/>${metaStrings[6]}<br/>${metaStrings[7]}<br/>${metaStrings[8]}<br/>${metaStrings[9]}`;
@@ -303,7 +485,8 @@
         currentImage.title = `${bird} - ${photographer} for Macaulay Library`;
 
         // Add bar chart
-        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+        //d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/2022-01-01/2023-01-01`).then((data)=>{
+        d3.json(`http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/${bird}/${startDate}/${endDate}`).then((data)=>{
             let monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
             for (item of data) {
                 monthCounts[item.OBSERVATION_MONTH-1]++;
@@ -311,12 +494,13 @@
             let trace1 = {
                 x: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
                 y: monthCounts,
-                type: "bar"
+                type: "bar",
+                marker: { color: '#d77a39'}
             };
             let traces1 = [trace1];
             let layout1 = {
-                title: `${bird}<br>Observations by Month in 2022`
-                //title: `Observations by Month in 2022`
+                //title: `${bird}<br>Observations by Month in 2022`
+                title: `${bird}<br>Observations by Month - ${startDate} - ${endDate}`
             };
             Plotly.newPlot("bar",traces1,layout1);
         });
@@ -325,11 +509,14 @@
         // ATTEMPT TO CLEAR MARKERS and regenerate map
         var birdMap 
         let base_url = 'http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/'
-        let dates_url = '/2023-01-01/2023-03-31'
-        let full_url = base_url + bird + dates_url
+        //let dates_url = '/2022-01-01/2022-12-31'
+        //let dates_url = '/${startDate}/${endDate}'
+        //let full_url = base_url + bird + dates_url
+        let full_url = base_url + bird + "/" + startDate + "/" + endDate
+        console.log("full_url = ", full_url);
 
         d3.json(full_url).then(function(response) {
-            console.log(response);
+            console.log("response = ", response);
             map.eachLayer(function(layer) {
                 map.removeLayer(layer);
             });
@@ -340,43 +527,42 @@
                 var childCount = cluster.getChildCount();
                 var clusterClass = 'marker-cluster-small';
                 if (childCount > 50) {
-                clusterClass = 'marker-cluster-medium';
+                    clusterClass = 'marker-cluster-medium';
                 }
                 if (childCount > 150) {
-                clusterClass = 'marker-cluster-large';
+                    clusterClass = 'marker-cluster-large';
                 }
                 if (childCount > 300) {
-                clusterClass = 'marker-cluster-xlarge';
+                    clusterClass = 'marker-cluster-xlarge';
                 }
                 if (childCount > 500) {
-                clusterClass = 'marker-cluster-xxlarge';
+                    clusterClass = 'marker-cluster-xxlarge';
                 }
                 if (childCount > 900) {
-                clusterClass = 'marker-cluster-xxxlarge';
+                    clusterClass = 'marker-cluster-xxxlarge';
                 }
                 return L.divIcon({
-                html: '<div><span>' + childCount + '</span></div>',
-                className: 'marker-cluster ' + clusterClass,
-                iconSize: new L.Point(40, 40),
-                iconAnchor: new L.Point(20, 20),
-                style: 'background-color: #FF7308; border-radius: 50%; text-align: center; font-weight: bold; font-size: 16px;'
+                    html: '<div><span>' + childCount + '</span></div>',
+                    className: 'marker-cluster ' + clusterClass,
+                    iconSize: new L.Point(40, 40),
+                    iconAnchor: new L.Point(20, 20),
+                    style: 'background-color: #FF7308; border-radius: 50%; text-align: center; font-weight: bold; font-size: 16px;'
                 });
             }
             });
-            console.log(markers);
+            console.log("markers = ", markers);
             //loop through the data
             for (var i = 0; i<response.length; i++){
-            //set the data location propert to a variable
-            var location = response[i];
-            
-            if (location){
-                //console.log(location);
-                //add marker to the new cluster group, and bind a popup
-                
-                markers.addLayer(L.marker([location.LATITUDE, location.LONGITUDE])
-                .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
-            }
-
+                //set the data location propert to a variable
+                var location = response[i];
+                if (location){
+                    //add marker to the new cluster group, and bind a popup
+                    markers.addLayer(L.marker([location.LATITUDE, location.LONGITUDE])
+                    .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE + '<br/>' + location['OBSERVATION_DATE'] + ' ' + location['TIME_OBSERVATIONS_STARTED'] ));
+                    //.bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE + '<br/>' + location['OBSERVATION_DATE'] ));
+                    //.bindPopup(location['COMMON_NAME'] + '<br/>' + location['OBSERVATION_DATE'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
+                    //.bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
+                }
             }
             map.addLayer(markers);
             map.setView({ lat: 39.8675979, lng: -89.6324862 }, 7);
@@ -391,7 +577,8 @@
 <!-- Map Script -->
 <script>
     //var map = L.map("map").setView({ lat: 48.1667, lng: -100.1800 }, 3.5);
-    var map = L.map("map").setView({ lat: 39.8675979, lng: -89.6324862 }, 7);
+    //var map = L.map("map").setView({ lat: 39.8675979, lng: -89.6324862 }, 7);
+    var map = L.map("map").setView({ lat: 39.8675979, lng: -89.6324862 }, 6.5);
     console.log("map =" , map);
 
     // <!-- Grayscale tile layer from https://leaflet-extras.github.io/leaflet-providers/preview/ ->
@@ -410,7 +597,8 @@
      <!-- D3  Javascript-->
      <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
      <!-- Our Javascript file-->
-     <script type = "text/javascript" src="leaflet-starter copy.js"></script>
+     <!-- <script type = "text/javascript" src="leaflet-starter copy.js"></script> -->
+     <script type = "text/javascript" src="leaflet-starter-copy.js"></script>
 </body>
 </html>
 

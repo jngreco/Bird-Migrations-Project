@@ -1,7 +1,7 @@
 // Set Up Variables 
 var birdMap 
 let base_url = 'http://127.0.0.1:5000/api/v1.0/obs_by_name_and_date/'
-let dates_url = '/2023-01-01/2023-03-31'
+let dates_url = '/2022-01-01/2022-12-31'
 let bird_url = 'Bald Eagle'
 let full_url = base_url + bird_url + dates_url
 
@@ -47,7 +47,8 @@ d3.json(full_url).then(function(response) {
       //add marker to the new cluster group, and bind a popup
       
       markers.addLayer(L.marker([location.LATITUDE, location.LONGITUDE])
-      .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
+      .bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE + '<br/>' + location['OBSERVATION_DATE'] + ' ' + location['TIME_OBSERVATIONS_STARTED'] ));
+      //.bindPopup(location['COMMON_NAME'] + '<br/>' + location.LATITUDE + ', ' + location.LONGITUDE));
     }
 
     }
