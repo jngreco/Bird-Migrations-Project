@@ -20,7 +20,8 @@ This project hinges on the communication and interaction between several indepen
   - Bootstrap
   - Leaflet
   - StadiaMaps
-  - D3
+  - D3.js
+  - Plotly.js
 
 
 Repo Link: https://github.com/jngreco/bird-migrations-project 
