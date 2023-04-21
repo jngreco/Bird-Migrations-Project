@@ -6,7 +6,7 @@
 ## Project Summary
 We want to explore bird migration patterns, with a focus on endangered species in the midwest. Using publicly available data, we will create visualizations of bird populations over time.
 
-The practical objective was to find a large dataset, convert it into a CSV, clean the data and populate a SQLite database. Then create a Flask app server to return webpage queries. Finally, creating an interactive webpage, using HTML, JavaScript, and CSS stylesheets to present the user-filtered data in a dynamic, accurate, and visually pleasing format.
+The practical objective was to find a large dataset (730k records), convert it into a CSV, clean the data and populate a SQLite database. Then create a Flask app server to return webpage queries. Finally, creating an interactive webpage, using HTML, JavaScript, and CSS stylesheets to present the user-filtered data in a dynamic, accurate, and visually pleasing format.
 
 This project hinges on the communication and interaction between several independent components. The applications, libraries and tools that we used include:
 - Applications
@@ -20,19 +20,16 @@ This project hinges on the communication and interaction between several indepen
   - Bootstrap
   - Leaflet
   - StadiaMaps
-  - D3.js
-  - Plotly.js
+  - D3
 
-**INSTRUCTIONS FOR RUNNING THE PROGRAM**
-1.  Ensure cleanbird.csv has dates in YYYY-MM-DD format
-2.  Run etl_all_columns.ipynb and etl_selected_columns.ipynb
-3.  In the integrated terminal, run this command: python bird_alchemy.py
-4.  Once the flask app is up and running, open up final-index.html in file explorer and click on the icon to open the app in Chrome
 
 Repo Link: https://github.com/jngreco/bird-migrations-project 
 
-### Data Sources and References:
+### Data Sources:
+- eBird API : https://documenter.getpostman.com/view/664302/S1ENwy59#intro 
 - Visualization examples : https://science.ebird.org/en/status-and-trends 
+- Illinois Audubon Society : https://illinoisaudubon.org/springmigrationdashboard/ 
+- Birdcast : https://dashboard.birdcast.info/region/US-IL-031 
 - eBird overview page: https://science.ebird.org/en/status-and-trends
 - eBird abundance animations: 
   - https://science.ebird.org/en/status-and-trends/abundance-animations 
@@ -54,7 +51,7 @@ SQLite is being used to host the data and perform anlysis functions. bird_alchem
 ### Creating Flask API endpoints
 Using Flask as our locally hosted database, we then created API endpoints for the future webpage to use for queries. Returned data is JSONified. We were able to connect Flask to Leaflet using Flask_CORS.
 API date filter with lat/lon grouping was added.
-### Creating an interactive HTML layout 
+### Creating an interacive HTML layout 
 ### Creating JavaScript instructions to relay dynamic data visualization
 ### Using D3 to retrieve data from the Flask server
 ### Using Plotly to visualize the retrieved data
@@ -66,4 +63,12 @@ Density data was then plotted using latitude and longitude, and grouped by speci
 The legend was added to the map, using a CSS file. The marker size is based on density. Marker popups were added to include Species, Location, Date Observed, and Time Observed. 
 ### Debugging, Debugging, and more Debugging
 
-Presentation Slides: https://docs.google.com/presentation/d/1Zr1E0qeJH4dpoARHbeLY03R9i2Yl7XwqJyb1aiQ0Cp0/edit?usp=sharing 
+
+
+
+## To activate the webpage, run the following in order:
+- etl_all_columns.ipynb
+- etl_selected_columns.ipynb
+- cleanbird.csv should be in the data folder
+- bird_alchemy.py
+- final-index.html
