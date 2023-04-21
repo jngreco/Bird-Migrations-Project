@@ -23,6 +23,11 @@ This project hinges on the communication and interaction between several indepen
   - D3.js
   - Plotly.js
 
+**INSTRUCTIONS FOR RUNNING THE PROGRAM**
+1.  Ensure cleanbird.csv has dates in YYYY-MM-DD format
+2.  Run etl_all_columns.ipynb and etl_selected_columns.ipynb
+3.  In the integrated terminal, run this command: python bird_alchemy.py
+4.  Once the flask app is up and running, open up final-index.html in file explorer and click on the icon to open the app in Chrome
 
 Repo Link: https://github.com/jngreco/bird-migrations-project 
 
