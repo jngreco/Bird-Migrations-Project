@@ -49,7 +49,7 @@ SQLite is being used to host the data and perform anlysis functions. bird_alchem
 ### Creating Flask API endpoints
 Using Flask as our locally hosted database, we then created API endpoints for the future webpage to use for queries. Returned data is JSONified. We were able to connect Flask to Leaflet using Flask_CORS.
 API date filter with lat/lon grouping was added.
-### Creating an interacive HTML layout 
+### Creating an interactive HTML layout 
 ### Creating JavaScript instructions to relay dynamic data visualization
 ### Using D3 to retrieve data from the Flask server
 ### Using Plotly to visualize the retrieved data
