@@ -70,5 +70,6 @@ The legend was added to the map, using a CSS file. The marker size is based on d
 - etl_all_columns.ipynb
 - etl_selected_columns.ipynb
 - cleanbird.csv should be in the data folder
+  - https://drive.google.com/file/d/1hfVGvOjTTN2X-Pao9hTL4Y6bSomcuf1E/view
 - bird_alchemy.py
 - final-index.html
